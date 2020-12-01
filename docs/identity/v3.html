@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Getting Started with Identity v3 &middot; gophercloud
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../../public/css/poole.css">
+  <link rel="stylesheet" href="../../public/css/syntax.css">
+  <link rel="stylesheet" href="../../public/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://gophercloud.io/public/apple-touch-icon-144-precomposed.png">
+                                 <link rel="shortcut icon" href="../../public/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="http://gophercloud.io/atom.xml">
+</head>
+
+
+  <body>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <img src="../../public/logo.png" />
+      <h1>
+        <a href="../../index.html">
+          gophercloud
+        </a>
+      </h1>
+      <p class="lead">Gophercloud is an open-source library for working with OpenStack clouds in golang.</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="../../index.html">Home</a>
+
+      <a class="sidebar-nav-item" href="../../installation.html">Installation</a>
+      <a class="sidebar-nav-item" href="../../docs.html">Documentation</a>
+
+      
+        <ul>
+          <li><a href="../block-storage.html">Block Storage</a></li>
+          <li><a href="../compute.html">Compute</a></li>
+          <li><a href="../identity.html">Identity</a></li>
+          <li><a href="../networking.html">Networking</a></li>
+          <li><a href="../object-storage.html">Object Storage</a></li>
+        </ul>
+      
+
+      <a class="sidebar-nav-item" href="https://github.com/rackspace/gophercloud/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a>
+      <a class="sidebar-nav-item" href="https://github.com/rackspace/gophercloud" target="_blank">GitHub</a>
+      <a class="sidebar-nav-item" href="http://godoc.org/github.com/rackspace/gophercloud" target="_blank">GoDoc</a>
+    </nav>
+
+    <p>&copy; 2015. All rights reserved.</p>
+
+    <p>Powered by <a href="https://github.com/poole/hyde" target="_blank">Hyde</a>.</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="page">
+  <h1 class="page-title">Getting Started with Identity v3</h1>
+  <ul>
+  <li><a href="v3.html#setup">Setup</a></li>
+  <li><a href="v3.html#tokens">Tokens</a>
+    <ul>
+      <li><a href="v3.html#create-token">Generate token</a></li>
+      <li><a href="v3.html#get-token">Get token</a></li>
+      <li><a href="v3.html#validate-token">Validate token</a></li>
+      <li><a href="v3.html#revoke-token">Revoke token</a></li>
+    </ul>
+  </li>
+  <li><a href="v3.html#services">Service catalog</a>
+    <ul>
+      <li><a href="v3.html#create-service">Add service</a></li>
+      <li><a href="v3.html#list-services">List services</a></li>
+      <li><a href="v3.html#get-service">Show service details</a></li>
+      <li><a href="v3.html#delete-service">Delete service</a></li>
+    </ul>
+  </li>
+  <li><a href="v3.html#endpoints">Endpoints</a>
+    <ul>
+      <li><a href="v3.html#create-endpoint">Add endpoint</a></li>
+      <li><a href="v3.html#list-endpoints">List endpoints</a></li>
+      <li><a href="v3.html#get-endpoint">Show endpoint details</a></li>
+      <li><a href="v3.html#delete-endpoint">Delete endpoint</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="a-namesetupasetup"><a name="setup"></a>Setup</h2>
+
+<p>In order to interact with OpenStack APIs, you must first pass in your auth
+credentials to a <code>Provider</code> struct. Once you have this, you then retrieve
+whichever service struct you’re interested in - so in our case, we invoke the
+<code>NewIdentityV2</code> method:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack&quot;</span>
+
+<span class="nx">authOpts</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">AuthOptionsFromEnv</span><span class="p">()</span>
+
+<span class="nx">provider</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">AuthenticatedClient</span><span class="p">(</span><span class="nx">authOpts</span><span class="p">)</span>
+
+<span class="nx">client</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">NewIdentityV3</span><span class="p">(</span><span class="nx">provider</span><span class="p">,</span> <span class="nx">gophercloud</span><span class="p">.</span><span class="nx">EndpointOpts</span><span class="p">{</span>
+	<span class="nx">Region</span><span class="p">:</span> <span class="s">&quot;RegionOne&quot;</span><span class="p">,</span>
+<span class="p">})</span></code></pre></div>
+
+<p>If you’re unsure about how to retrieve credentials, please read our <a href="../../docs.html">introductory
+guide</a> which outlines the steps you need to take.</p>
+
+<h2 id="a-nametokensatokens"><a name="tokens"></a>Tokens</h2>
+
+<p>A token is an arbitrary bit of text that is returned when you authenticate,
+which you subsequently use as to access and control API resources. Each
+token has a scope that describes which resources are accessible with it. A
+token may be revoked at anytime and is valid for a finite duration.</p>
+
+<h3 id="a-namecreate-tokenagenerate-a-token"><a name="create-token"></a>Generate a token</h3>
+
+<p>The configuration options that you need to pass into <code>tokens.AuthOptions</code> will
+mostly depend on your provider: some authenticate with API keys rather than
+passwords, some require tenant names or tenant IDs; with others, both are
+required. It is therefore useful to double check what the expectations are
+before authenticating.</p>
+
+<p>Scoping was introduced in v3, which allows you to confine the token’s scope to
+a particular project. If no scope is provided, and the user has a default one
+set, that will be used; if there is no default, the token returned will not
+have any explicit scope defined.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack/identity/v3/tokens&quot;</span>
+
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">AuthOptions</span><span class="p">{</span>
+	<span class="nx">IdentityEndpoint</span><span class="p">:</span> <span class="s">&quot;{identityEndpoint}&quot;</span><span class="p">,</span>
+	<span class="nx">Username</span><span class="p">:</span> <span class="s">&quot;{username}&quot;</span><span class="p">,</span>
+	<span class="nx">Password</span><span class="p">:</span> <span class="s">&quot;{password}&quot;</span><span class="p">,</span>
+	<span class="nx">TenantID</span><span class="p">:</span> <span class="s">&quot;{tenantID}&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1">// This is completely optional</span>
+<span class="nx">scope</span> <span class="o">:=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">Scope</span><span class="p">{</span><span class="nx">ProjectName</span><span class="p">:</span> <span class="s">&quot;tmp_project&quot;</span><span class="p">}</span>
+
+<span class="c1">// Make the call</span>
+<span class="nx">token</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">,</span> <span class="nx">scope</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-nameget-tokenaget-token"><a name="get-token"></a>Get token</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">token</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;token_id&quot;</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namevalidate-tokenavalidate-token"><a name="validate-token"></a>Validate token</h3>
+
+<p>To check whether an existing token is still valid (i.e. whether it has expired
+  or not), you can validate a token ID and get back a boolean value.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">valid</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">Validate</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;token_id&quot;</span><span class="p">)</span></code></pre></div>
+
+<h3 id="a-namerevoke-tokenarevoke-token"><a name="revoke-token"></a>Revoke token</h3>
+
+<p>Revoking a token will prevent it being used in further API calls.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">err</span> <span class="o">:=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">Revoke</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;token_id&quot;</span><span class="p">)</span></code></pre></div>
+
+<h2 id="a-nameservicesaservice-catalog"><a name="services"></a>Service catalog</h2>
+
+<p>A service is a RESTful API that controls the functionality of an OpenStack
+service - such as as Compute, Object Storage, etc. It provides one or more
+endpoints through which users can access resources and perform operations.</p>
+
+<h3 id="a-namecreate-serviceaadd-service"><a name="create-service"></a>Add service</h3>
+
+<p>The only parameter required when creating a new service is the “type” in string
+form:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack/identity/v3/services&quot;</span>
+
+<span class="nx">service</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">services</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;service_type&quot;</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namelist-servicesalist-services"><a name="list-services"></a>List services</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/pagination&quot;</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/openstack/identity/v2/services&quot;</span>
+<span class="p">)</span>
+
+<span class="c1">// We have the option of filtering the service list. If we want the full</span>
+<span class="c1">// collection, leave it as an empty struct</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">services</span><span class="p">.</span><span class="nx">ListOpts</span><span class="p">{</span><span class="nx">ServiceType</span><span class="p">:</span> <span class="s">&quot;foo_type&quot;</span><span class="p">,</span> <span class="nx">Limit</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
+
+<span class="c1">// Retrieve a pager (i.e. a paginated collection)</span>
+<span class="nx">pager</span> <span class="o">:=</span> <span class="nx">services</span><span class="p">.</span><span class="nx">List</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Define an anonymous function to be executed on each page&#39;s iteration</span>
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">pager</span><span class="p">.</span><span class="nx">EachPage</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">page</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">serviceList</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">services</span><span class="p">.</span><span class="nx">ExtractServices</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">s</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">serviceList</span> <span class="p">{</span>
+		<span class="c1">// &quot;s&quot; will be a services.Service</span>
+	<span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+<h3 id="a-nameget-serviceashow-service-details"><a name="get-service"></a>Show service details</h3>
+
+<p>In order to retrieve the details for a particular service, all you need is its
+UUID in string form:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">service</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">services</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;service_id&quot;</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-nameupdate-serviceaupdate-service"><a name="update-service"></a>Update service</h3>
+
+<p>The only modifiable attribute for a service is its type. To set a new one:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">service</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">services</span><span class="p">.</span><span class="nx">Update</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;service_id&quot;</span><span class="p">,</span> <span class="s">&quot;new_type&quot;</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namedelete-serviceadelete-service"><a name="delete-service"></a>Delete service</h3>
+
+<p>To permanently delete a service from the catalog, just pass in its UUID like so:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">err</span> <span class="o">:=</span> <span class="nx">services</span><span class="p">.</span><span class="nx">Delete</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;service_id&quot;</span><span class="p">)</span></code></pre></div>
+
+<h2 id="a-nameendpointsaendpoints"><a name="endpoints"></a>Endpoints</h2>
+
+<p>An endpoint is a network-accessible address, usually described by a URL, where
+a service may be accessed. If using an extension for templates, you can create
+an endpoint template, which represents the templates of all the consumable
+services that are available across the regions.</p>
+
+<h3 id="a-namecreate-endpointaadd-endpoint"><a name="create-endpoint"></a>Add endpoint</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud&quot;</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/openstack/identity/v3/endpoints&quot;</span>
+<span class="p">)</span>
+
+<span class="c1">// All fields except Region are required</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">endpoints</span><span class="p">.</span><span class="nx">EndpointOpts</span><span class="p">{</span>
+	<span class="nx">Availability</span><span class="p">:</span> <span class="nx">gophercloud</span><span class="p">.</span><span class="nx">AvailabilityPublic</span><span class="p">,</span>
+	<span class="nx">Name</span><span class="p">:</span> <span class="s">&quot;backup_endpoint&quot;</span><span class="p">,</span>
+	<span class="nx">Region</span><span class="p">:</span> <span class="s">&quot;Region4&quot;</span><span class="p">,</span>
+	<span class="nx">URL</span><span class="p">:</span> <span class="s">&quot;backup.my-openstack.org&quot;</span><span class="p">,</span>
+	<span class="nx">ServiceID</span><span class="p">:</span> <span class="s">&quot;service_id&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="nx">endpoint</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">endpoints</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namelist-endpointsalist-endpoints"><a name="list-endpoints"></a>List endpoints</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/pagination&quot;</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/openstack/identity/v2/endpoints&quot;</span>
+<span class="p">)</span>
+
+<span class="c1">// We have the option of filtering the endpoint list. If we want the full</span>
+<span class="c1">// collection, leave it as an empty struct</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">endpoints</span><span class="p">.</span><span class="nx">ListOpts</span><span class="p">{</span><span class="nx">ServiceID</span><span class="p">:</span> <span class="s">&quot;service_id&quot;</span><span class="p">,</span> <span class="nx">Limit</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
+
+<span class="c1">// Retrieve a pager (i.e. a paginated collection)</span>
+<span class="nx">pager</span> <span class="o">:=</span> <span class="nx">endpoints</span><span class="p">.</span><span class="nx">List</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Define an anonymous function to be executed on each page&#39;s iteration</span>
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">pager</span><span class="p">.</span><span class="nx">EachPage</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">page</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">endpointList</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">endpoints</span><span class="p">.</span><span class="nx">ExtractEndpoints</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">e</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">endpointList</span> <span class="p">{</span>
+		<span class="c1">// &quot;e&quot; will be a endpoints.Endpoint</span>
+	<span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+<h3 id="a-nameupdate-endpointaupdate-endpoint"><a name="update-endpoint"></a>Update endpoint</h3>
+
+<p>All fields are modifiable and are optional.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud&quot;</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/openstack/identity/v3/endpoints&quot;</span>
+<span class="p">)</span>
+
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">endpoints</span><span class="p">.</span><span class="nx">EndpointOpts</span><span class="p">{</span><span class="nx">Name</span><span class="p">:</span> <span class="s">&quot;new_name&quot;</span><span class="p">}</span>
+
+<span class="nx">endpoint</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">endpoints</span><span class="p">.</span><span class="nx">Update</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;endpoint_id&quot;</span><span class="p">,</span> <span class="nx">opts</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namedelete-endpointadelete-endpoint"><a name="delete-endpoint"></a>Delete endpoint</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">err</span> <span class="o">:=</span> <span class="nx">endpoints</span><span class="p">.</span><span class="nx">Delete</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;endpoint_id&quot;</span><span class="p">)</span></code></pre></div>
+
+
+</div>
+
+    </div>
+
+    <script type="text/javascript">
+  var _gaq = _gaq || [];
+   _gaq.push(['_setAccount', 'UA-35639070-1']);
+   _gaq.push(['_setDomainName', 'rackspace.com']);
+   _gaq.push(['_trackPageview']);
+
+  (function () {
+      var ga = document.createElement('script');
+      ga.type = 'text/javascript';
+      ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+       var s = document.getElementsByTagName('script')[0];
+       s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </body>
+</html>

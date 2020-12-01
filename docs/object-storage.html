@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Getting Started with Object Storage v1 &middot; gophercloud
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../public/css/poole.css">
+  <link rel="stylesheet" href="../public/css/syntax.css">
+  <link rel="stylesheet" href="../public/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://gophercloud.io/public/apple-touch-icon-144-precomposed.png">
+                                 <link rel="shortcut icon" href="../public/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="http://gophercloud.io/atom.xml">
+</head>
+
+
+  <body>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <img src="../public/logo.png" />
+      <h1>
+        <a href="../index.html">
+          gophercloud
+        </a>
+      </h1>
+      <p class="lead">Gophercloud is an open-source library for working with OpenStack clouds in golang.</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="../index.html">Home</a>
+
+      <a class="sidebar-nav-item" href="../installation.html">Installation</a>
+      <a class="sidebar-nav-item" href="../docs.html">Documentation</a>
+
+      
+        <ul>
+          <li><a href="block-storage.html">Block Storage</a></li>
+          <li><a href="compute.html">Compute</a></li>
+          <li><a href="identity.html">Identity</a></li>
+          <li><a href="networking.html">Networking</a></li>
+          <li><a href="object-storage.html">Object Storage</a></li>
+        </ul>
+      
+
+      <a class="sidebar-nav-item" href="https://github.com/rackspace/gophercloud/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a>
+      <a class="sidebar-nav-item" href="https://github.com/rackspace/gophercloud" target="_blank">GitHub</a>
+      <a class="sidebar-nav-item" href="http://godoc.org/github.com/rackspace/gophercloud" target="_blank">GoDoc</a>
+    </nav>
+
+    <p>&copy; 2015. All rights reserved.</p>
+
+    <p>Powered by <a href="https://github.com/poole/hyde" target="_blank">Hyde</a>.</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="page">
+  <h1 class="page-title">Getting Started with Object Storage v1</h1>
+  <ul>
+  <li><a href="object-storage.html#setup">Setup</a></li>
+  <li><a href="object-storage.html#containers">Containers</a>
+    <ul>
+      <li><a href="object-storage.html#create-container">Create container</a></li>
+      <li><a href="object-storage.html#list-containers">List containers</a></li>
+      <li><a href="object-storage.html#container-metadata">Metadata</a></li>
+      <li><a href="object-storage.html#delete-container">Delete container</a></li>
+    </ul>
+  </li>
+  <li><a href="object-storage.html#objects">Objects</a>
+    <ul>
+      <li><a href="object-storage.html#upload-object">Upload objects</a></li>
+      <li><a href="object-storage.html#list-objects">List objects</a></li>
+      <li><a href="object-storage.html#copy-object">Copying objects</a></li>
+      <li><a href="object-storage.html#download-object">Download objects</a></li>
+      <li><a href="object-storage.html#object-metadata">Metadata</a></li>
+    </ul>
+  </li>
+  <li><a href="object-storage.html#account">Account</a>
+    <ul>
+      <li><a href="object-storage.html#view-account-metadata">View metadata</a></li>
+      <li><a href="object-storage.html#update-account-metadata">Update metadata</a></li>
+    </ul>
+  </li>
+  <li><a href="object-storage.html#providers">Providers</a>
+    <ul>
+      <li><a href="object-storage.html#rackspace">Rackspace</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="a-namesetupasetup"><a name="setup"></a>Setup</h2>
+
+<p>In order to interact with OpenStack APIs, you must first pass in your auth
+credentials to a <code>Provider</code> struct. Once you have this, you then retrieve
+whichever service struct you’re interested in - so in our case, we invoke the
+<code>NewObjectStorageV1</code> method:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">authOpts</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">AuthOptionsFromEnv</span><span class="p">()</span>
+
+<span class="nx">provider</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">AuthenticatedClient</span><span class="p">(</span><span class="nx">authOpts</span><span class="p">)</span>
+
+<span class="nx">client</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">NewObjectStorageV1</span><span class="p">(</span><span class="nx">provider</span><span class="p">,</span> <span class="nx">gophercloud</span><span class="p">.</span><span class="nx">EndpointOpts</span><span class="p">{</span>
+	<span class="nx">Region</span><span class="p">:</span> <span class="s">&quot;RegionOne&quot;</span><span class="p">,</span>
+<span class="p">})</span></code></pre></div>
+
+<p>If you’re unsure about how to retrieve credentials, please read our <a href="../docs.html">introductory
+guide</a> which outlines the steps you need to take.</p>
+
+<h2 id="a-namecontainersacontainers"><a name="containers"></a>Containers</h2>
+
+<p>A container is a storage compartment that provides a way for you to organize
+your objects. It is analogous to a Linux directory or Windows folder, with the
+exception that you cannot nest containers in other containers like a filesystem.</p>
+
+<h3 id="a-namecreate-containeracreate-a-new-container"><a name="create-container"></a>Create a new container</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack/objectstorage/v1/containers&quot;</span>
+
+<span class="c1">// We have the option of passing in configuration options for our new container</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">containers</span><span class="p">.</span><span class="nx">CreateOpts</span><span class="p">{</span>
+	<span class="nx">ContainerSyncTo</span><span class="p">:</span> <span class="s">&quot;backup_container&quot;</span><span class="p">,</span>
+	<span class="nx">Metadata</span><span class="p">:</span>        <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="s">&quot;author&quot;</span><span class="p">:</span> <span class="s">&quot;emily dickinson&quot;</span><span class="p">},</span>
+<span class="p">}</span>
+
+<span class="nx">res</span> <span class="o">:=</span> <span class="nx">containers</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;container_name&quot;</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// If we want to extract information out from the response headers, we can.</span>
+<span class="c1">// The first return value will be http.Header (alias of map[string][]string).</span>
+<span class="nx">headers</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">res</span><span class="p">.</span><span class="nx">ExtractHeader</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namelist-containersalist-containers"><a name="list-containers"></a>List containers</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/pagination&quot;</span>
+
+<span class="c1">// We have the option of filtering containers by their attributes</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">containers</span><span class="p">.</span><span class="nx">ListOpts</span><span class="p">{</span><span class="nx">Full</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">Prefix</span><span class="p">:</span> <span class="s">&quot;backup_&quot;</span><span class="p">}</span>
+
+<span class="c1">// Retrieve a pager (i.e. a paginated collection)</span>
+<span class="nx">pager</span> <span class="o">:=</span> <span class="nx">containers</span><span class="p">.</span><span class="nx">List</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Define an anonymous function to be executed on each page&#39;s iteration</span>
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">pager</span><span class="p">.</span><span class="nx">EachPage</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">page</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+
+	<span class="c1">// Get a slice of containers.Container structs</span>
+	<span class="nx">containerList</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">containers</span><span class="p">.</span><span class="nx">ExtractInfo</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">c</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">containerList</span> <span class="p">{</span>
+		<span class="c1">// ...</span>
+	<span class="p">}</span>
+
+	<span class="c1">// Get a slice of strings, i.e. container names</span>
+	<span class="nx">containerNames</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">containers</span><span class="p">.</span><span class="nx">ExtractNames</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">n</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">containerNames</span> <span class="p">{</span>
+		<span class="c1">// ...</span>
+	<span class="p">}</span>
+
+	<span class="k">return</span> <span class="kc">true</span><span class="p">,</span> <span class="kc">nil</span>
+<span class="p">})</span></code></pre></div>
+
+<h3 id="a-namecontainer-metadataaview-and-modify-container-metadata"><a name="container-metadata"></a>View and modify container metadata</h3>
+
+<p>To retrieve a container’s metadata:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">metadata</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">containers</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;container_name&quot;</span><span class="p">).</span><span class="nx">ExtractMetadata</span><span class="p">()</span>
+
+<span class="c1">// Iterate over the map[string]string</span>
+<span class="k">for</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">val</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">metadata</span> <span class="p">{</span>
+	<span class="c1">// ...</span>
+<span class="p">}</span></code></pre></div>
+
+<p>To update a container’s metadata:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// We need to specify the new metadata. Keys that do not exist will be added,</span>
+<span class="c1">// keys that already exist will be overriden. Keys that are not included in</span>
+<span class="c1">// this struct will be deleted.</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">containers</span><span class="p">.</span><span class="nx">UpdateOpts</span><span class="p">{</span>
+	<span class="nx">Metadata</span><span class="p">:</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="s">&quot;new_key&quot;</span><span class="p">:</span> <span class="s">&quot;new_value&quot;</span><span class="p">},</span>
+<span class="p">}</span>
+
+<span class="nx">result</span> <span class="o">:=</span> <span class="nx">containers</span><span class="p">.</span><span class="nx">Update</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;container_name&quot;</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span></code></pre></div>
+
+<h3 id="a-namedelete-containeradelete-an-existing-container"><a name="delete-container"></a>Delete an existing container</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">response</span> <span class="o">:=</span> <span class="nx">containers</span><span class="p">.</span><span class="nx">Delete</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;container_name&quot;</span><span class="p">)</span>
+
+<span class="c1">// Like most operations, we can extract headers values too</span>
+<span class="nx">headers</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">ExtractHeader</span><span class="p">()</span></code></pre></div>
+
+<h2 id="a-nameobjectsaobjects"><a name="objects"></a>Objects</h2>
+
+<p>An object stores data content, such as documents, images, and so on. Another way
+to think about it is that it’s like a traditional file on a local filesystem
+but with lots of additional functionality. For example, you can store custom
+metadata on an object, compress files, manage access with CORS and temporary
+URLs, schedule deletions, and execute batch operations (like deleting 10,000
+objects at a time).</p>
+
+<h3 id="a-nameupload-objectaupload-objects"><a name="upload-object"></a>Upload objects</h3>
+
+<p>When uploading a new object, you need to the container name you’re
+uploading to, and the name of your new object. You also need to provide the
+content of your object - and to do this, you need to use Golang’s standard
+<a href="http://golang.org/pkg/io/#ReadSeeker"><code>io.ReadSeeker</code></a> interface.</p>
+
+<p>The first thing you need If you want to upload the contents of a local file:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;os&quot;</span>
+
+<span class="nx">content</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Open</span><span class="p">(</span><span class="s">&quot;/path/to/file&quot;</span><span class="p">)</span></code></pre></div>
+
+<p>or to use a basic string:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;strings&quot;</span>
+
+<span class="nx">content</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nx">NewReader</span><span class="p">(</span><span class="s">&quot;your string&quot;</span><span class="p">)</span></code></pre></div>
+
+<p>or to use a slice of bytes:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;bytes&quot;</span>
+
+<span class="nx">content</span> <span class="o">:=</span> <span class="nx">bytes</span><span class="p">.</span><span class="nx">NewReader</span><span class="p">(</span><span class="nx">bytes</span><span class="p">)</span></code></pre></div>
+
+<p>Once you have your content in the form of a reader, you can create your object:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack/objectstorage/v1/objects&quot;</span>
+
+<span class="c1">// You have the option of specifying additional configuration options.</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">objects</span><span class="p">.</span><span class="nx">CreateOpts</span><span class="p">{</span>
+	<span class="nx">ContentDisposition</span><span class="p">:</span> <span class="s">`attachment; filename=&quot;foo_bar.pdf&quot;`</span><span class="p">,</span>
+	<span class="nx">DeleteAfter</span><span class="p">:</span> <span class="mi">3600</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1">// Now execute the upload</span>
+<span class="nx">res</span> <span class="o">:=</span> <span class="nx">objects</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;container_name&quot;</span><span class="p">,</span> <span class="s">&quot;object_name&quot;</span><span class="p">,</span> <span class="nx">content</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// We have the option of extracting the resulting headers from the response</span>
+<span class="nx">headers</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">res</span><span class="p">.</span><span class="nx">ExtractHeader</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namelist-objectsalist-objects"><a name="list-objects"></a>List objects</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/pagination&quot;</span>
+
+<span class="c1">// We have the option of filtering objects by their attributes</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">objects</span><span class="p">.</span><span class="nx">ListOpts</span><span class="p">{</span><span class="nx">Full</span><span class="p">:</span> <span class="kc">true</span><span class="p">}</span>
+
+<span class="c1">// Retrieve a pager (i.e. a paginated collection)</span>
+<span class="nx">pager</span> <span class="o">:=</span> <span class="nx">objects</span><span class="p">.</span><span class="nx">List</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;container_name&quot;</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Define an anonymous function to be executed on each page&#39;s iteration</span>
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">pager</span><span class="p">.</span><span class="nx">EachPage</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">page</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+
+	<span class="c1">// Get a slice of objects.Object structs</span>
+	<span class="nx">objectList</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">objects</span><span class="p">.</span><span class="nx">ExtractInfo</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">n</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">objectNames</span> <span class="p">{</span>
+		<span class="c1">// ...</span>
+	<span class="p">}</span>
+
+	<span class="c1">// Get a slice of strings, i.e. object names</span>
+	<span class="nx">objectNames</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">containers</span><span class="p">.</span><span class="nx">ExtractNames</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">n</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">objectNames</span> <span class="p">{</span>
+		<span class="c1">// ...</span>
+	<span class="p">}</span>
+
+	<span class="k">return</span> <span class="kc">true</span><span class="p">,</span> <span class="kc">nil</span>
+<span class="p">})</span></code></pre></div>
+
+<h3 id="a-namecopy-objectacopy-to-new-location"><a name="copy-object"></a>Copy to new location</h3>
+
+<p>Let’s say we want to copy <code>logs/wednesday_14th</code> to <code>backup/wednesday_14th_2014</code>.
+This operation always creates a new object. If you use this operation against an
+existing object, you replace the existing object and metadata rather than
+modifying the object.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// Define our options</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">objects</span><span class="p">.</span><span class="nx">CopyOpts</span><span class="p">{</span><span class="nx">Destination</span><span class="p">:</span> <span class="s">&quot;backup/wednesday_14th_2014&quot;</span><span class="p">}</span>
+
+<span class="c1">// Perform the copy</span>
+<span class="nx">result</span> <span class="o">:=</span> <span class="nx">objects</span><span class="p">.</span><span class="nx">Copy</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;logs&quot;</span><span class="p">,</span> <span class="s">&quot;wednesday_14th&quot;</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Extract response headers</span>
+<span class="nx">headers</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">ExtractHeader</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namedownload-objectadownload-object"><a name="download-object"></a>Download object</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// Configure options</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">objects</span><span class="p">.</span><span class="nx">DownloadOpts</span><span class="p">{</span><span class="nx">IfUnmodifiedSince</span><span class="p">:</span> <span class="s">&quot;date&quot;</span><span class="p">}</span>
+
+<span class="c1">// Download everything into a DownloadResult struct</span>
+<span class="nx">res</span> <span class="o">:=</span> <span class="nx">objects</span><span class="p">.</span><span class="nx">Download</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;container_name&quot;</span><span class="p">,</span> <span class="s">&quot;object_name&quot;</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Extract a slice of bytes</span>
+<span class="nx">bytes</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">res</span><span class="p">.</span><span class="nx">ExtractContent</span><span class="p">()</span>
+
+<span class="c1">// Extract headers</span>
+<span class="nx">header</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">res</span><span class="p">.</span><span class="nx">ExtractHeader</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-nameobject-metadataaretrieve-and-update-metadata"><a name="object-metadata"></a>Retrieve and update metadata</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// We can specify additional options (to enable conditional requests for example)</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">objects</span><span class="p">.</span><span class="nx">DownloadOpts</span><span class="p">{</span><span class="nx">IfMatch</span><span class="p">:</span> <span class="s">&quot;etag&quot;</span><span class="p">}</span>
+
+<span class="c1">// To perform the download operation</span>
+<span class="nx">result</span> <span class="o">:=</span> <span class="nx">objects</span><span class="p">.</span><span class="nx">Download</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;container_name&quot;</span><span class="p">,</span> <span class="s">&quot;object_name&quot;</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// To extract content out into a slice of bytes, we can use:</span>
+<span class="nx">bytes</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">ExtractContent</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namedelete-objectadelete-object"><a name="delete-object"></a>Delete object</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">result</span> <span class="o">:=</span> <span class="nx">objects</span><span class="p">.</span><span class="nx">Delete</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;container_name&quot;</span><span class="p">,</span> <span class="s">&quot;object_name&quot;</span><span class="p">)</span></code></pre></div>
+
+<h2 id="a-nameaccountaaccount"><a name="account"></a>Account</h2>
+
+<p>An account represents the very top-level namespace of the resource hierarchy -
+containers belong to accounts, and objects belong to containers. Normally your
+service provider creates your account and you then own and can control all the
+resources in that account. The account defines a namespace for containers. In
+the OpenStack environment, account is synonymous with a project or a tenant.</p>
+
+<h3 id="a-nameview-account-metadataaretrieve-metadata"><a name="view-account-metadata"></a>Retrieve metadata</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack/objectstorage/v1/accounts&quot;</span>
+
+<span class="c1">// Get information from the API</span>
+<span class="nx">res</span> <span class="o">:=</span> <span class="nx">accounts</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">GetOpts</span><span class="p">{})</span>
+
+<span class="c1">// Extract metadata out of it</span>
+<span class="nx">metadata</span> <span class="o">:=</span> <span class="nx">res</span><span class="p">.</span><span class="nx">ExtractMetadata</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">metadata</span> <span class="p">{</span>
+	<span class="c1">// ...</span>
+<span class="p">}</span></code></pre></div>
+
+<h3 id="a-nameupdate-account-metadataaupdate-metadata"><a name="update-account-metadata"></a>Update metadata</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// Set new metadata</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">accounts</span><span class="p">.</span><span class="nx">UpdateOpts</span><span class="p">{</span>
+	<span class="nx">Metadata</span><span class="p">:</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="s">&quot;foo&quot;</span><span class="p">:</span> <span class="s">&quot;bar&quot;</span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Send to API</span>
+<span class="nx">res</span> <span class="o">:=</span> <span class="nx">accounts</span><span class="p">.</span><span class="nx">Update</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Extract metadata out of it</span>
+<span class="nx">metadata</span> <span class="o">:=</span> <span class="nx">res</span><span class="p">.</span><span class="nx">ExtractMetadata</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">metadata</span> <span class="p">{</span>
+	<span class="c1">// ...</span>
+<span class="p">}</span></code></pre></div>
+
+<h2 id="a-nameprovidersaproviders"><a name="providers"></a>Providers</h2>
+
+<h3 id="a-namerackspacearackspace"><a name="rackspace"></a>Rackspace</h3>
+
+<ul>
+  <li><a href="https://developer.rackspace.com/docs/cloud-files/getting-started/?lang=go">Quickstart for Cloud Files</a>
+on the Rackspace Developer portal.</li>
+</ul>
+
+</div>
+
+    </div>
+
+    <script type="text/javascript">
+  var _gaq = _gaq || [];
+   _gaq.push(['_setAccount', 'UA-35639070-1']);
+   _gaq.push(['_setDomainName', 'rackspace.com']);
+   _gaq.push(['_trackPageview']);
+
+  (function () {
+      var ga = document.createElement('script');
+      ga.type = 'text/javascript';
+      ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+       var s = document.getElementsByTagName('script')[0];
+       s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </body>
+</html>

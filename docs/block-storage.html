@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Getting Started with Block Storage v1 &middot; gophercloud
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../public/css/poole.css">
+  <link rel="stylesheet" href="../public/css/syntax.css">
+  <link rel="stylesheet" href="../public/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://gophercloud.io/public/apple-touch-icon-144-precomposed.png">
+                                 <link rel="shortcut icon" href="../public/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="http://gophercloud.io/atom.xml">
+</head>
+
+
+  <body>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <img src="../public/logo.png" />
+      <h1>
+        <a href="../index.html">
+          gophercloud
+        </a>
+      </h1>
+      <p class="lead">Gophercloud is an open-source library for working with OpenStack clouds in golang.</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="../index.html">Home</a>
+
+      <a class="sidebar-nav-item" href="../installation.html">Installation</a>
+      <a class="sidebar-nav-item" href="../docs.html">Documentation</a>
+
+      
+        <ul>
+          <li><a href="block-storage.html">Block Storage</a></li>
+          <li><a href="compute.html">Compute</a></li>
+          <li><a href="identity.html">Identity</a></li>
+          <li><a href="networking.html">Networking</a></li>
+          <li><a href="object-storage.html">Object Storage</a></li>
+        </ul>
+      
+
+      <a class="sidebar-nav-item" href="https://github.com/rackspace/gophercloud/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a>
+      <a class="sidebar-nav-item" href="https://github.com/rackspace/gophercloud" target="_blank">GitHub</a>
+      <a class="sidebar-nav-item" href="http://godoc.org/github.com/rackspace/gophercloud" target="_blank">GoDoc</a>
+    </nav>
+
+    <p>&copy; 2015. All rights reserved.</p>
+
+    <p>Powered by <a href="https://github.com/poole/hyde" target="_blank">Hyde</a>.</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="page">
+  <h1 class="page-title">Getting Started with Block Storage v1</h1>
+  <ul>
+  <li><a href="block-storage.html#setup">Setup</a></li>
+  <li><a href="block-storage.html#volume-types">Volume types</a>
+    <ul>
+      <li><a href="block-storage.html#list-types">List volume types</a></li>
+      <li><a href="block-storage.html#create-type">Create volume type</a></li>
+      <li><a href="block-storage.html#show-type">Show volume type</a></li>
+      <li><a href="block-storage.html#delete-type">Delete volume type</a></li>
+    </ul>
+  </li>
+  <li><a href="block-storage.html#volumes">Volumes</a>
+    <ul>
+      <li><a href="block-storage.html#list-volumes">List volumes</a></li>
+      <li><a href="block-storage.html#create-volume">Create volume</a></li>
+      <li><a href="block-storage.html#show-volume">Show volume details</a></li>
+      <li><a href="block-storage.html#delete-volume">Delete volume</a></li>
+    </ul>
+  </li>
+  <li><a href="block-storage.html#snapshots">Snapshots</a>
+    <ul>
+      <li><a href="block-storage.html#list-snapshots">List snapshots</a></li>
+      <li><a href="block-storage.html#create-snapshot">Create snapshots</a></li>
+      <li><a href="block-storage.html#show-snapshot">Show snapshot details</a></li>
+      <li><a href="block-storage.html#delete-snapshot">Delete snapshot</a></li>
+      <li><a href="block-storage.html#update-snapshot-metadata">Update metadata</a></li>
+    </ul>
+  </li>
+  <li><a href="block-storage.html#providers">Providers</a>
+    <ul>
+      <li><a href="block-storage.html#rackspace">Rackspace</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="a-namesetupasetup"> <a name="setup"></a>Setup</h2>
+
+<p>In order to interact with OpenStack APIs, you must first pass in your auth
+credentials to a <code>Provider</code> struct. Once you have this, you then retrieve
+whichever service struct you’re interested in - so in our case, we invoke the
+<code>NewBlockStorageV1</code> method:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack&quot;</span>
+
+<span class="nx">authOpts</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">AuthOptionsFromEnv</span><span class="p">()</span>
+
+<span class="nx">provider</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">AuthenticatedClient</span><span class="p">(</span><span class="nx">authOpts</span><span class="p">)</span>
+
+<span class="nx">client</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">NewBlockStorageV1</span><span class="p">(</span><span class="nx">provider</span><span class="p">,</span> <span class="nx">gophercloud</span><span class="p">.</span><span class="nx">EndpointOpts</span><span class="p">{</span>
+	<span class="nx">Region</span><span class="p">:</span> <span class="s">&quot;RegionOne&quot;</span><span class="p">,</span>
+<span class="p">})</span></code></pre></div>
+
+<p>If you’re unsure about how to retrieve credentials, please read our <a href="../docs.html">introductory
+guide</a> which outlines the steps you need to take.</p>
+
+<h2 id="a-namevolume-typesavolume-types"><a name="volume-types"></a>Volume types</h2>
+
+<p>A volume type is… well… the type of a block storage volume you want. You
+can define whatever types work best for you, such as SATA, SCSCI, SSD, etc.
+These can be customized or defined by the OpenStack admin.</p>
+
+<h3 id="a-namelist-typesalist-volume-types"><a name="list-types"></a>List volume types</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/pagination&quot;</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/openstack/blockstorage/v1/volumetypes&quot;</span>
+<span class="p">)</span>
+
+<span class="c1">// Retrieve a pager (i.e. a paginated collection)</span>
+<span class="nx">pager</span> <span class="o">:=</span> <span class="nx">volumetypes</span><span class="p">.</span><span class="nx">List</span><span class="p">(</span><span class="nx">client</span><span class="p">)</span>
+
+<span class="c1">// Define an anonymous function to be executed on each page&#39;s iteration</span>
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">pager</span><span class="p">.</span><span class="nx">EachPage</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">page</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">vtList</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">volumetypes</span><span class="p">.</span><span class="nx">ExtractVolumeTypes</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">vt</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">vtList</span> <span class="p">{</span>
+		<span class="c1">// &quot;vt&quot; will be a volumetypes.VolumeType</span>
+	<span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+<h3 id="a-namecreate-typeacreate-volume-type"><a name="create-type"></a>Create volume type</h3>
+
+<p>In order to create a new volume type, you must specify a name.</p>
+
+<p>You can also define <code>ExtraSpecs</code> associated with your volume types. For
+instance, you could have a <code>SATA</code> VolumeType with these extra specs: RPM=10000
+and RAID-Level=5.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack/blockstorage/v1/volumetypes&quot;</span>
+
+<span class="c1">// Optional</span>
+<span class="nx">specs</span> <span class="o">:=</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{}{</span><span class="nx">RAID</span><span class="o">-</span><span class="nx">Level</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="nx">RPM</span><span class="p">:</span> <span class="mi">10000</span><span class="p">}</span>
+
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">volumetypes</span><span class="p">.</span><span class="nx">CreateOpts</span><span class="p">{</span><span class="nx">Name</span><span class="p">:</span> <span class="s">&quot;new_type&quot;</span><span class="p">,</span> <span class="nx">ExtraSpecs</span><span class="p">:</span> <span class="nx">specs</span><span class="p">}</span>
+
+<span class="nx">vt</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">volumetypes</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-nameshow-typeashow-volume-type-details"><a name="show-type"></a>Show volume type details</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">vt</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">volumetypes</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;volume_type_id&quot;</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namedelete-typeadelete-volume-type"><a name="delete-type"></a>Delete volume type</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">err</span> <span class="o">:=</span> <span class="nx">volumetypes</span><span class="p">.</span><span class="nx">Delete</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;volume_type_id&quot;</span><span class="p">)</span></code></pre></div>
+
+<h2 id="a-namevolumesavolumes"><a name="volumes"></a>Volumes</h2>
+
+<p>A volume is a detachable block storage device (you can think of it as a USB
+hard drive). It can only be attached to one instance at a time.</p>
+
+<h3 id="a-namecreate-volumeacreate-volume"><a name="create-volume"></a>Create volume</h3>
+
+<p>The only required attribute when creating a new volume is its size. All other
+attributes are optional.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack/blockstorage/v1/volumes&quot;</span>
+
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">volumes</span><span class="p">.</span><span class="nx">CreateOpts</span><span class="p">{</span><span class="nx">Size</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">Name</span><span class="p">:</span> <span class="s">&quot;foo_volume&quot;</span><span class="p">,</span> <span class="nx">VolumeType</span><span class="p">:</span> <span class="s">&quot;volume_type_id&quot;</span><span class="p">}</span>
+
+<span class="nx">vol</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">volumes</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namelist-volumesalist-volumes"><a name="list-volumes"></a>List volumes</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/pagination&quot;</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/openstack/blockstorage/v1/volumetypes&quot;</span>
+<span class="p">)</span>
+
+<span class="c1">// We can filter by status</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">volumes</span><span class="p">.</span><span class="nx">ListOpts</span><span class="p">{</span><span class="nx">Status</span><span class="p">:</span> <span class="s">&quot;IN-USE&quot;</span><span class="p">}</span>
+
+<span class="c1">// Retrieve a pager (i.e. a paginated collection)</span>
+<span class="nx">pager</span> <span class="o">:=</span> <span class="nx">volumes</span><span class="p">.</span><span class="nx">List</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Define an anonymous function to be executed on each page&#39;s iteration</span>
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">pager</span><span class="p">.</span><span class="nx">EachPage</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">page</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">vList</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">volumes</span><span class="p">.</span><span class="nx">ExtractVolumes</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">vList</span> <span class="p">{</span>
+		<span class="c1">// &quot;v&quot; will be a volumes.Volume</span>
+	<span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+<h3 id="a-nameshow-volumeashow-volume-details"><a name="show-volume"></a>Show volume details</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">vol</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">volumes</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;volume_id&quot;</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-nameupdate-volumeaupdate-volume"> <a name="update-volume"></a>Update volume</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">opts</span> <span class="o">:=</span> <span class="nx">volumes</span><span class="p">.</span><span class="nx">UpdateOpts</span><span class="p">{</span><span class="nx">Name</span><span class="p">:</span> <span class="s">&quot;new_name&quot;</span><span class="p">}</span>
+
+<span class="nx">vol</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">volumes</span><span class="p">.</span><span class="nx">Update</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;volume_id&quot;</span><span class="p">,</span> <span class="nx">opts</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namedelete-volumeadelete-volume"><a name="delete-volume"></a>Delete volume</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">err</span> <span class="o">:=</span> <span class="nx">volumes</span><span class="p">.</span><span class="nx">Delete</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;volume_id&quot;</span><span class="p">)</span></code></pre></div>
+
+<h2 id="a-namesnapshotsasnapshots"><a name="snapshots"></a>Snapshots</h2>
+
+<p>A snapshot is point-in-time copy of the data contained in a volume.</p>
+
+<h3 id="a-namecreate-snapshotacreate-snapshot"><a name="create-snapshot"></a>Create snapshot</h3>
+
+<p>The only required attribute when creating a new snapshot is the ID of the
+volume you’re backing up.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack/blockstorage/v1/snapshots&quot;</span>
+
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">snapshots</span><span class="p">.</span><span class="nx">CreateOpts</span><span class="p">{</span><span class="nx">Name</span><span class="p">:</span> <span class="s">&quot;2014_oct&quot;</span><span class="p">,</span> <span class="nx">VolumeID</span><span class="p">:</span> <span class="s">&quot;volume_id&quot;</span><span class="p">}</span>
+
+<span class="nx">snap</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">snapshots</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namelist-snapshotsalist-snapshots"><a name="list-snapshots"></a>List snapshots</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/pagination&quot;</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/openstack/blockstorage/v1/snapshots&quot;</span>
+<span class="p">)</span>
+
+<span class="c1">// We can filter by status</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">snapshots</span><span class="p">.</span><span class="nx">ListOpts</span><span class="p">{</span><span class="nx">Status</span><span class="p">:</span> <span class="s">&quot;ERROR&quot;</span><span class="p">}</span>
+
+<span class="c1">// Retrieve a pager (i.e. a paginated collection)</span>
+<span class="nx">pager</span> <span class="o">:=</span> <span class="nx">snapshots</span><span class="p">.</span><span class="nx">List</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Define an anonymous function to be executed on each page&#39;s iteration</span>
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">pager</span><span class="p">.</span><span class="nx">EachPage</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">page</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">sList</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">snapshots</span><span class="p">.</span><span class="nx">ExtractSnapshots</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">s</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">sList</span> <span class="p">{</span>
+		<span class="c1">// &quot;s&quot; will be a snapshots.Snapshot</span>
+	<span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+<h3 id="a-nameshow-snapshotashow-snapshot-details"><a name="show-snapshot"></a>Show snapshot details</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">snap</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">snapshots</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;snapshot_id&quot;</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namedelete-snapshotadelete-snapshot"><a name="delete-snapshot"></a>Delete snapshot</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">err</span> <span class="o">:=</span> <span class="nx">snapshots</span><span class="p">.</span><span class="nx">Delete</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;snapshot_id&quot;</span><span class="p">)</span></code></pre></div>
+
+<h3 id="a-nameupdate-snapshot-metadataaupdate-snapshot-metadata"><a name="update-snapshot-metadata"></a>Update snapshot metadata</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">opts</span> <span class="o">:=</span> <span class="nx">snapshots</span><span class="p">.</span><span class="nx">UpdateMetadataOpts</span><span class="p">{</span>
+	<span class="nx">Metadata</span><span class="p">:</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{}{</span>
+		<span class="nx">Foo</span><span class="p">:</span> <span class="s">&quot;bar&quot;</span><span class="p">,</span>
+		<span class="nx">Baz</span><span class="p">:</span> <span class="s">&quot;foo&quot;</span><span class="p">,</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">res</span> <span class="o">:=</span> <span class="nx">snapshots</span><span class="p">.</span><span class="nx">UpdateMetadata</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;snapshot_id&quot;</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// To extract snapshot out</span>
+<span class="nx">snap</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">res</span><span class="p">.</span><span class="nx">Extract</span><span class="p">()</span>
+
+<span class="c1">// To extract a metadata map</span>
+<span class="nx">metadata</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">res</span><span class="p">.</span><span class="nx">ExtractMetadata</span><span class="p">()</span></code></pre></div>
+
+<h2 id="a-nameprovidersaproviders"><a name="providers"></a>Providers</h2>
+
+<h3 id="a-namerackspacearackspace"><a name="rackspace"></a>Rackspace</h3>
+
+<ul>
+  <li><a href="https://developer.rackspace.com/docs/cloud-block-storage/getting-started/?lang=go">Quickstart for Cloud Block Storage</a>
+on the Rackspace Developer portal.</li>
+</ul>
+
+</div>
+
+    </div>
+
+    <script type="text/javascript">
+  var _gaq = _gaq || [];
+   _gaq.push(['_setAccount', 'UA-35639070-1']);
+   _gaq.push(['_setDomainName', 'rackspace.com']);
+   _gaq.push(['_trackPageview']);
+
+  (function () {
+      var ga = document.createElement('script');
+      ga.type = 'text/javascript';
+      ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+       var s = document.getElementsByTagName('script')[0];
+       s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </body>
+</html>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Getting Started with Compute v2 &middot; gophercloud
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../public/css/poole.css">
+  <link rel="stylesheet" href="../public/css/syntax.css">
+  <link rel="stylesheet" href="../public/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://gophercloud.io/public/apple-touch-icon-144-precomposed.png">
+                                 <link rel="shortcut icon" href="../public/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="http://gophercloud.io/atom.xml">
+</head>
+
+
+  <body>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <img src="../public/logo.png" />
+      <h1>
+        <a href="../index.html">
+          gophercloud
+        </a>
+      </h1>
+      <p class="lead">Gophercloud is an open-source library for working with OpenStack clouds in golang.</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="../index.html">Home</a>
+
+      <a class="sidebar-nav-item" href="../installation.html">Installation</a>
+      <a class="sidebar-nav-item" href="../docs.html">Documentation</a>
+
+      
+        <ul>
+          <li><a href="block-storage.html">Block Storage</a></li>
+          <li><a href="compute.html">Compute</a></li>
+          <li><a href="identity.html">Identity</a></li>
+          <li><a href="networking.html">Networking</a></li>
+          <li><a href="object-storage.html">Object Storage</a></li>
+        </ul>
+      
+
+      <a class="sidebar-nav-item" href="https://github.com/rackspace/gophercloud/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a>
+      <a class="sidebar-nav-item" href="https://github.com/rackspace/gophercloud" target="_blank">GitHub</a>
+      <a class="sidebar-nav-item" href="http://godoc.org/github.com/rackspace/gophercloud" target="_blank">GoDoc</a>
+    </nav>
+
+    <p>&copy; 2015. All rights reserved.</p>
+
+    <p>Powered by <a href="https://github.com/poole/hyde" target="_blank">Hyde</a>.</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="page">
+  <h1 class="page-title">Getting Started with Compute v2</h1>
+  <ul>
+  <li><a href="compute.html#setup">Setup</a></li>
+  <li><a href="compute.html#flavors">Flavors</a>
+    <ul>
+      <li><a href="compute.html#list-flavors">List flavors</a></li>
+      <li><a href="compute.html#get-flavor">Get flavor</a></li>
+      <li><a href="compute.html#get-flavor-id">Get flavor ID</a></li>
+    </ul>
+  </li>
+  <li><a href="compute.html#images">Images</a>
+    <ul>
+      <li><a href="compute.html#list-images">List images</a></li>
+      <li><a href="compute.html#get-image">Get image</a></li>
+      <li><a href="compute.html#get-image-id">Get image ID</a></li>
+      <li><a href="compute.html#delete-image">Delete image</a></li>
+    </ul>
+  </li>
+  <li><a href="compute.html#keypairs">Key Pairs</a>
+    <ul>
+      <li><a href="compute.html#create-keypair">Create a Key Pair</a></li>
+      <li><a href="compute.html#delete-keypair">Delete a Key Pair</a></li>
+    </ul>
+  </li>
+  <li><a href="compute.html#secgroups">Security Groups</a>
+    <ul>
+      <li><a href="compute.html#create-secgroup">Create a Security Group</a></li>
+      <li><a href="compute.html#delete-secgroup">Delete a Security Group</a></li>
+    </ul>
+  </li>
+  <li><a href="compute.html#servergroups">Server Groups</a>
+    <ul>
+      <li><a href="compute.html#create-servergroup">Create a Server Group</a></li>
+      <li><a href="compute.html#delete-servergroup">Delete a Server Group</a></li>
+    </ul>
+  </li>
+  <li><a href="compute.html#servers">Servers</a>
+    <ul>
+      <li><a href="compute.html#create-server">Create a server</a></li>
+      <li><a href="compute.html#list-servers">List servers</a></li>
+      <li><a href="compute.html#get-server">Get server</a></li>
+      <li><a href="compute.html#update-server">Update server</a></li>
+      <li><a href="compute.html#delete-server">Delete server</a></li>
+      <li><a href="compute.html#change-password">Change admin password</a></li>
+      <li><a href="compute.html#rebuild">Rebuild</a></li>
+      <li><a href="compute.html#resize">Resize</a></li>
+      <li><a href="compute.html#confirm">Confirm resize</a></li>
+      <li><a href="compute.html#revert">Revert resize</a></li>
+      <li><a href="compute.html#start-server">Start</a></li>
+      <li><a href="compute.html#stop-server">Stop</a></li>
+      <li><a href="compute.html#boot-from-volume">Boot from volume</a></li>
+      <li><a href="compute.html#schedulerhints">Scheduler Hints</a></li>
+    </ul>
+  </li>
+  <li><a href="compute.html#more">More</a></li>
+  <li><a href="compute.html#providers">Providers</a>
+    <ul>
+      <li><a href="compute.html#rackspace">Rackspace</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="a-namesetupasetup"><a name="setup"></a>Setup</h1>
+
+<p>In order to interact with OpenStack APIs, you must first pass in your auth
+credentials to a <code>Provider</code> struct. Once you have this, you then retrieve
+whichever service struct you’re interested in - so in our case, we invoke the
+<code>NewComputeV2</code> method:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack&quot;</span>
+
+<span class="nx">authOpts</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">AuthOptionsFromEnv</span><span class="p">()</span>
+
+<span class="nx">provider</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">AuthenticatedClient</span><span class="p">(</span><span class="nx">authOpts</span><span class="p">)</span>
+
+<span class="nx">client</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">NewComputeV2</span><span class="p">(</span><span class="nx">provider</span><span class="p">,</span> <span class="nx">gophercloud</span><span class="p">.</span><span class="nx">EndpointOpts</span><span class="p">{</span>
+	<span class="nx">Region</span><span class="p">:</span> <span class="s">&quot;RegionOne&quot;</span><span class="p">,</span>
+<span class="p">})</span></code></pre></div>
+
+<p>If you’re unsure about how to retrieve credentials, please read our <a href="../docs.html">introductory
+guide</a> which outlines the steps you need to take.</p>
+
+<h1 id="a-nameflavorsaflavors"><a name="flavors"></a>Flavors</h1>
+
+<p>A flavor is a hardware configuration for a server. Each one has a unique
+combination of disk space, memory capacity and priority for CPU time.</p>
+
+<h3 id="a-namelist-flavorsalist-all-available-flavors"><a name="list-flavors"></a>List all available flavors</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/pagination&quot;</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/openstack/compute/v2/flavors&quot;</span>
+<span class="p">)</span>
+
+<span class="c1">// We have the option of filtering the flavor list. If we want the full</span>
+<span class="c1">// collection, leave it as an empty struct</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">flavors</span><span class="p">.</span><span class="nx">ListOpts</span><span class="p">{</span><span class="nx">ChangesSince</span><span class="p">:</span> <span class="s">&quot;2014-01-01T01:02:03Z&quot;</span><span class="p">,</span> <span class="nx">MinRAM</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
+
+<span class="c1">// Retrieve a pager (i.e. a paginated collection)</span>
+<span class="nx">pager</span> <span class="o">:=</span> <span class="nx">flavors</span><span class="p">.</span><span class="nx">List</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Define an anonymous function to be executed on each page&#39;s iteration</span>
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">pager</span><span class="p">.</span><span class="nx">EachPage</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">page</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">flavorList</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">networks</span><span class="p">.</span><span class="nx">ExtractFlavors</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">f</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">flavorList</span> <span class="p">{</span>
+		<span class="c1">// &quot;f&quot; will be a flavors.Flavor</span>
+	<span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+<h3 id="a-nameget-flavoraget-details-for-a-specific-flavor"><a name="get-flavor"></a>Get details for a specific flavor</h3>
+
+<p>In order to retrieve information for a specific flavor, you need its UUID in
+string form. You receive back a <code>flavors.Flavor</code> struct with <code>ID</code>, <code>Disk</code>, <code>RAM</code>,
+<code>Name</code>, <code>RxTxFactor</code>, <code>Swap</code> and <code>VCPUs</code> fields.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// Get back a flavors.Flavor struct</span>
+<span class="nx">flavor</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">flavors</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;flavor_id&quot;</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-nameget-flavor-idaget-a-flavor-id-from-a-flavor-name"><a name="get-flavor-id"></a>Get a flavor ID from a flavor Name</h3>
+
+<p>You can look up the ID of a flavor by using its human-readable name.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// Get back a flavor ID string</span>
+<span class="nx">flavorID</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">flavors</span><span class="p">.</span><span class="nx">IDFromName</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;flavor_name&quot;</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h1 id="a-nameimagesaimages"><a name="images"></a>Images</h1>
+
+<p>An image is the operating system for a VM - a collection of files used to
+create or rebuild a server. Operators provide a number of pre-built OS images
+by default, but you may also create custom images from cloud servers you have
+launched.</p>
+
+<h3 id="a-namelist-imagesalist-all-available-images"><a name="list-images"></a>List all available images</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/pagination&quot;</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/openstack/compute/v2/images&quot;</span>
+<span class="p">)</span>
+
+<span class="c1">// We have the option of filtering the image list. If we want the full</span>
+<span class="c1">// collection, leave it as an empty struct</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">images</span><span class="p">.</span><span class="nx">ListOpts</span><span class="p">{</span><span class="nx">ChangesSince</span><span class="p">:</span> <span class="s">&quot;2014-01-01T01:02:03Z&quot;</span><span class="p">,</span> <span class="nx">Name</span><span class="p">:</span> <span class="s">&quot;Ubuntu 12.04&quot;</span><span class="p">}</span>
+
+<span class="c1">// Retrieve a pager (i.e. a paginated collection)</span>
+<span class="nx">pager</span> <span class="o">:=</span> <span class="nx">images</span><span class="p">.</span><span class="nx">List</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Define an anonymous function to be executed on each page&#39;s iteration</span>
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">pager</span><span class="p">.</span><span class="nx">EachPage</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">page</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">imageList</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">images</span><span class="p">.</span><span class="nx">ExtractImages</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">i</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">imageList</span> <span class="p">{</span>
+		<span class="c1">// &quot;i&quot; will be a images.Image</span>
+	<span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+<h3 id="a-nameget-imageaget-details-for-a-specific-image"><a name="get-image"></a>Get details for a specific image</h3>
+
+<p>In order to retrieve information for a specific flavor, you need its UUID in
+string form. You receive back an <code>images.Image</code> struct with <code>ID</code>, <code>Created</code>, <code>MinDisk</code>,
+<code>MinRAM</code>, <code>Name</code>, <code>Progress</code>, <code>Status</code> and <code>Updated</code> fields.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// Get back a images.Image struct</span>
+<span class="nx">image</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">images</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;image_id&quot;</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-nameget-image-idaget-an-image-id-from-an-image-name"><a name="get-image-id"></a>Get an image ID from an image Name</h3>
+
+<p>You can look up the ID of an image by using its human-readable name.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// Get back an image ID string</span>
+<span class="nx">imageID</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">images</span><span class="p">.</span><span class="nx">IDFromName</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;image_name&quot;</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namedelete-imageadelete-an-image"><a name="delete-image"></a>Delete an image</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">res</span> <span class="o">:=</span> <span class="nx">images</span><span class="p">.</span><span class="nx">Delete</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;image_id&quot;</span><span class="p">)</span></code></pre></div>
+
+<h1 id="a-namekeypairsakey-pairs"><a name="keypairs"></a>Key Pairs</h1>
+
+<h3 id="a-namecreate-keypairacreate-a-key-pair"><a name="create-keypair"></a>Create a Key Pair</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+  <span class="s">&quot;crypto/rand&quot;</span>
+  <span class="s">&quot;crypto/rsa&quot;</span>
+
+  <span class="s">&quot;github.com/rackspace/gophercloud/openstack/compute/v2/extensions/keypairs&quot;</span>
+
+  <span class="s">&quot;golang.org/x/crypto/ssh&quot;</span>
+<span class="p">)</span>
+
+<span class="nx">privateKey</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">rsa</span><span class="p">.</span><span class="nx">GenerateKey</span><span class="p">(</span><span class="nx">rand</span><span class="p">.</span><span class="nx">Reader</span><span class="p">,</span> <span class="mi">2048</span><span class="p">)</span>
+<span class="nx">publicKey</span> <span class="o">:=</span> <span class="nx">privateKey</span><span class="p">.</span><span class="nx">PublicKey</span>
+<span class="nx">pub</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">ssh</span><span class="p">.</span><span class="nx">NewPublicKey</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">publicKey</span><span class="p">)</span>
+<span class="nx">pubBytes</span> <span class="o">:=</span> <span class="nx">ssh</span><span class="p">.</span><span class="nx">MarshalAuthorizedKey</span><span class="p">(</span><span class="nx">pub</span><span class="p">)</span>
+<span class="nx">pk</span> <span class="o">:=</span> <span class="nb">string</span><span class="p">(</span><span class="nx">pubBytes</span><span class="p">)</span>
+
+<span class="nx">kp</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">keypairs</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">keypairs</span><span class="p">.</span><span class="nx">CreateOpts</span><span class="p">{</span>
+  <span class="nx">Name</span><span class="p">:</span>      <span class="s">&quot;keypair_name&quot;</span><span class="p">,</span>
+  <span class="nx">PublicKey</span><span class="p">:</span> <span class="nx">pk</span><span class="p">,</span>
+<span class="p">}).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namedelete-keypairadelete-a-key-pair"><a name="delete-keypair"></a>Delete a Key Pair</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">err</span> <span class="o">:=</span> <span class="nx">keypairs</span><span class="p">.</span><span class="nx">Delete</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;keypair_name&quot;</span><span class="p">).</span><span class="nx">ExtractErr</span><span class="p">()</span></code></pre></div>
+
+<h1 id="a-namesecgroupsasecurity-groups"><a name="secgroups"></a>Security Groups</h1>
+
+<h3 id="a-namecreate-secgroupacreate-a-security-group"><a name="create-secgroup"></a>Create a Security Group</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+  <span class="s">&quot;github.com/rackspace/gophercloud/openstack/compute/v2/extensions/secgroups&quot;</span>
+<span class="p">)</span>
+
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">secgroups</span><span class="p">.</span><span class="nx">CreateOpts</span><span class="p">{</span>
+  <span class="nx">Name</span><span class="p">:</span>        <span class="s">&quot;MySecGroup&quot;</span><span class="p">,</span>
+  <span class="nx">Description</span><span class="p">:</span> <span class="s">&quot;something&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="nx">group</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">secgroups</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span>
+
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">secgroups</span><span class="p">.</span><span class="nx">CreateRuleOpts</span><span class="p">{</span>
+  <span class="nx">ParentGroupID</span><span class="p">:</span> <span class="nx">group</span><span class="p">.</span><span class="nx">ID</span><span class="p">,</span>
+  <span class="nx">FromPort</span><span class="p">:</span>      <span class="mi">22</span><span class="p">,</span>
+  <span class="nx">ToPort</span><span class="p">:</span>        <span class="mi">22</span><span class="p">,</span>
+  <span class="nx">IPProtocol</span><span class="p">:</span>    <span class="s">&quot;TCP&quot;</span><span class="p">,</span>
+  <span class="nx">CIDR</span><span class="p">:</span>          <span class="s">&quot;0.0.0.0/0&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="nx">rule</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">secgroups</span><span class="p">.</span><span class="nx">CreateRule</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namedelete-secgroupadelete-a-security-group"><a name="delete-secgroup"></a>Delete a Security Group</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">err</span> <span class="o">:=</span> <span class="nx">secgroups</span><span class="p">.</span><span class="nx">Delete</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">group</span><span class="p">.</span><span class="nx">ID</span><span class="p">).</span><span class="nx">ExtractErr</span><span class="p">()</span></code></pre></div>
+
+<h1 id="a-nameservergroupsaserver-groups"><a name="servergroups"></a>Server Groups</h1>
+
+<h3 id="a-namecreate-servergroupacreate-a-server-group"><a name="create-servergroup"></a>Create a Server Group</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+  <span class="s">&quot;github.com/rackspace/gophercloud/openstack/compute/v2/extensions/servergroups&quot;</span>
+<span class="p">)</span>
+
+<span class="nx">sg</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">servergroups</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">computeClient</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">servergroups</span><span class="p">.</span><span class="nx">CreateOpts</span><span class="p">{</span>
+  <span class="nx">Name</span><span class="p">:</span>     <span class="s">&quot;test&quot;</span><span class="p">,</span>
+  <span class="nx">Policies</span><span class="p">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&quot;affinity&quot;</span><span class="p">},</span>
+<span class="p">}).</span><span class="nx">Extract</span><span class="p">()</span>
+
+<span class="s">`Policies`</span> <span class="nx">can</span> <span class="nx">either</span> <span class="nx">be</span> <span class="s">`affinity`</span> <span class="nx">or</span> <span class="s">`anti-affinity`</span><span class="p">.</span></code></pre></div>
+
+<h3 id="a-namedelete-servergroupadelete-a-server-group"><a name="delete-servergroup"></a>Delete a Server Group</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">err</span> <span class="o">:=</span> <span class="nx">servergroups</span><span class="p">.</span><span class="nx">Delete</span><span class="p">(</span><span class="nx">computeClient</span><span class="p">,</span> <span class="s">&quot;servergroup_id&quot;</span><span class="p">).</span><span class="nx">ExtractErr</span><span class="p">()</span></code></pre></div>
+
+<h1 id="a-nameserversaservers"><a name="servers"></a>Servers</h1>
+
+<p>A server is either a virtual machine (VM) instance or a physical device
+managed by the compute system.</p>
+
+<h3 id="a-namecreate-serveracreate-a-server"><a name="create-server"></a>Create a server</h3>
+
+<p>To create a server with a minimal configuration, do:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">server</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">CreateOpts</span><span class="p">{</span>
+  <span class="nx">Name</span><span class="p">:</span>      <span class="nx">name</span><span class="p">,</span>
+  <span class="nx">FlavorName</span><span class="p">:</span> <span class="s">&quot;flavor_name&quot;</span><span class="p">,</span>
+  <span class="nx">ImageName</span><span class="p">:</span> <span class="s">&quot;image_name&quot;</span><span class="p">,</span>
+<span class="p">}).</span><span class="nx">Extract</span><span class="p">()</span>
+<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+  <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Unable to create server: %s&quot;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Server ID: %s&quot;</span><span class="p">,</span> <span class="nx">server</span><span class="p">.</span><span class="nx">ID</span><span class="p">)</span></code></pre></div>
+
+<p>See the <a href="http://godoc.org/github.com/rackspace/gophercloud/openstack/compute/v2/servers">Go Documentation</a>
+for a full list of Create options.</p>
+
+<h3 id="a-namelist-serversalist-all-available-servers"><a name="list-servers"></a>List all available servers</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/pagination&quot;</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/openstack/compute/v2/servers&quot;</span>
+<span class="p">)</span>
+
+<span class="c1">// We have the option of filtering the server list. If we want the full</span>
+<span class="c1">// collection, leave it as an empty struct</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">ListOpts</span><span class="p">{</span><span class="nx">Name</span><span class="p">:</span> <span class="s">&quot;server_1&quot;</span><span class="p">}</span>
+
+<span class="c1">// Retrieve a pager (i.e. a paginated collection)</span>
+<span class="nx">pager</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">List</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Define an anonymous function to be executed on each page&#39;s iteration</span>
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">pager</span><span class="p">.</span><span class="nx">EachPage</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">page</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">serverList</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">ExtractServers</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">s</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">serverList</span> <span class="p">{</span>
+		<span class="c1">// &quot;s&quot; will be a servers.Server</span>
+	<span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+<h3 id="a-nameget-serveraget-details-for-a-server"><a name="get-server"></a>Get details for a server</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// We need the UUID in string form</span>
+<span class="nx">server</span><span class="p">,</span> <span class="nx">id</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;server_id&quot;</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-nameupdate-serveraupdate-an-existing-server"><a name="update-server"></a>Update an existing server</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">opts</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">UpdateOpts</span><span class="p">{</span><span class="nx">Name</span><span class="p">:</span> <span class="s">&quot;new_name&quot;</span><span class="p">}</span>
+
+<span class="nx">server</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">Update</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;server_id&quot;</span><span class="p">,</span> <span class="nx">opts</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namedelete-serveradelete-an-existing-server"><a name="delete-server"></a>Delete an existing server</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">result</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">Delete</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;server_id&quot;</span><span class="p">)</span></code></pre></div>
+
+<h3 id="a-namechange-passwordachange-admin-password"><a name="change-password"></a>Change admin password</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">result</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">ChangeAdminPassword</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;server_id&quot;</span><span class="p">,</span> <span class="s">&quot;newPassword_&amp;123&quot;</span><span class="p">)</span></code></pre></div>
+
+<h3 id="a-namerebootareboot-a-server"><a name="reboot"></a>Reboot a server</h3>
+
+<p>There are two different methods for rebooting a VM: soft or hard reboot. A
+soft reboot instructs the operating system to initiate its own restart procedure,
+whereas a hard reboot cuts power (if a physical machine) or teminates the
+instance at the hypervisor level (if a virtual machine).</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// You have a choice of two reboot methods: servers.SoftReboot or servers.HardReboot</span>
+<span class="nx">result</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">Reboot</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;server_id&quot;</span><span class="p">,</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">SoftReboot</span><span class="p">)</span></code></pre></div>
+
+<h3 id="a-namerebuildarebuild-a-server"><a name="rebuild"></a>Rebuild a server</h3>
+
+<p>The rebuild operation removes all data on the server and replaces it with the
+image specified. The server’s existing ID and all IP addresses will remain the
+same.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// You have the option of specifying additional options</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">RebuildOpts</span><span class="p">{</span>
+	<span class="nx">Name</span><span class="p">:</span>      <span class="s">&quot;new_name&quot;</span><span class="p">,</span>
+	<span class="nx">AdminPass</span><span class="p">:</span> <span class="s">&quot;admin_password&quot;</span><span class="p">,</span>
+	<span class="nx">ImageID</span><span class="p">:</span>   <span class="s">&quot;image_id&quot;</span><span class="p">,</span>
+	<span class="nx">Metadata</span><span class="p">:</span>  <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="s">&quot;owner&quot;</span><span class="p">:</span> <span class="s">&quot;me&quot;</span><span class="p">},</span>
+<span class="p">}</span>
+
+<span class="nx">result</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">Rebuild</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;server_id&quot;</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// You can extract a servers.Server struct from the HTTP response</span>
+<span class="nx">server</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-nameresizearesize-a-server"><a name="resize"></a>Resize a server</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">result</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">Resize</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;server_id&quot;</span><span class="p">,</span> <span class="s">&quot;new_flavor_id&quot;</span><span class="p">)</span></code></pre></div>
+
+<h3 id="a-nameconfirmaconfirm-a-resize-operation"><a name="confirm"></a>Confirm a resize operation</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">result</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">ConfirmResize</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;server_id&quot;</span><span class="p">)</span></code></pre></div>
+
+<h3 id="a-namerevertarevert-a-resize-operation"><a name="revert"></a>Revert a resize operation</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">result</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">RevertResize</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;server_id&quot;</span><span class="p">)</span></code></pre></div>
+
+<h3 id="a-namestop-serverastop-a-server"><a name="stop-server"></a>Stop a Server</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+  <span class="s">&quot;github.com/rackspace/gophercloud/openstack/compute/v2/servers&quot;</span>
+  <span class="s">&quot;github.com/rackspace/gophercloud/openstack/compute/v2/extensions/startstop&quot;</span>
+<span class="p">)</span>
+
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">startstop</span><span class="p">.</span><span class="nx">Stop</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;server_id&quot;</span><span class="p">).</span><span class="nx">ExtractErr</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namestart-serverastart-a-server"><a name="start-server"></a>Start a Server</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+  <span class="s">&quot;github.com/rackspace/gophercloud/openstack/compute/v2/servers&quot;</span>
+  <span class="s">&quot;github.com/rackspace/gophercloud/openstack/compute/v2/extensions/startstop&quot;</span>
+<span class="p">)</span>
+
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">startstop</span><span class="p">.</span><span class="nx">Start</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;server_id&quot;</span><span class="p">).</span><span class="nx">ExtractErr</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-nameboot-from-volumeaboot-from-a-volume"><a name="boot-from-volume"></a>Boot from a Volume</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+  <span class="s">&quot;github.com/rackspace/gophercloud/openstack/compute/v2/servers&quot;</span>
+  <span class="s">&quot;github.com/rackspace/gophercloud/openstack/compute/v2/extensions/bootfromvolume&quot;</span>
+<span class="p">)</span>
+
+<span class="nx">bd</span> <span class="o">:=</span> <span class="p">[]</span><span class="nx">bootfromvolume</span><span class="p">.</span><span class="nx">BlockDevice</span><span class="p">{</span>
+  <span class="nx">bootfromvolume</span><span class="p">.</span><span class="nx">BlockDevice</span><span class="p">{</span>
+    <span class="nx">UUID</span><span class="p">:</span>       <span class="s">&quot;image_id&quot;</span><span class="p">,</span>
+    <span class="nx">SourceType</span><span class="p">:</span> <span class="nx">bootfromvolume</span><span class="p">.</span><span class="nx">Image</span><span class="p">,</span>
+    <span class="nx">VolumeSize</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+  <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="nx">serverCreateOpts</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">CreateOpts</span><span class="p">{</span>
+  <span class="nx">Name</span><span class="p">:</span>      <span class="nx">name</span><span class="p">,</span>
+  <span class="nx">FlavorRef</span><span class="p">:</span> <span class="s">&quot;flavor_id&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="nx">server</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">bootfromvolume</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">bootfromvolume</span><span class="p">.</span><span class="nx">CreateOptsExt</span><span class="p">{</span>
+  <span class="nx">serverCreateOpts</span><span class="p">,</span>
+  <span class="nx">bd</span><span class="p">,</span>
+<span class="p">}).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-nameschedulerhintsascheduler-hints"><a name="schedulerhints"></a>Scheduler Hints</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+  <span class="s">&quot;github.com/rackspace/gophercloud&quot;</span>
+  <span class="s">&quot;github.com/rackspace/gophercloud/openstack/compute/v2/extensions/schedulerhints&quot;</span>
+  <span class="s">&quot;github.com/rackspace/gophercloud/openstack/compute/v2/extensions/servergroups&quot;</span>
+  <span class="s">&quot;github.com/rackspace/gophercloud/openstack/compute/v2/servers&quot;</span>
+<span class="p">)</span>
+
+<span class="nx">sg</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">servergroups</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">computeClient</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">servergroups</span><span class="p">.</span><span class="nx">CreateOpts</span><span class="p">{</span>
+  <span class="nx">Name</span><span class="p">:</span>     <span class="s">&quot;test&quot;</span><span class="p">,</span>
+  <span class="nx">Policies</span><span class="p">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&quot;affinity&quot;</span><span class="p">},</span>
+<span class="p">}).</span><span class="nx">Extract</span><span class="p">()</span>
+
+<span class="nx">serverCreateOpts</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">CreateOpts</span><span class="p">{</span>
+  <span class="nx">Name</span><span class="p">:</span>      <span class="nx">name</span><span class="p">,</span>
+  <span class="nx">FlavorName</span><span class="p">:</span> <span class="s">&quot;flavor_name&quot;</span><span class="p">,</span>
+  <span class="nx">ImageName</span><span class="p">:</span>  <span class="s">&quot;image_name&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="nx">server</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">servers</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">computeClient</span><span class="p">,</span> <span class="nx">schedulerhints</span><span class="p">.</span><span class="nx">CreateOptsExt</span><span class="p">{</span>
+  <span class="nx">serverCreateOpts</span><span class="p">,</span>
+  <span class="nx">schedulerhints</span><span class="p">.</span><span class="nx">SchedulerHints</span><span class="p">{</span>
+    <span class="nx">Group</span><span class="p">:</span> <span class="nx">sg</span><span class="p">.</span><span class="nx">ID</span><span class="p">,</span>
+  <span class="p">},</span>
+<span class="p">}).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h1 id="a-namemoreamore"><a name="more"></a>More</h1>
+
+<p>It’s possible for a new feature or action to be added before the documentation is updated.
+Check the <a href="http://godoc.org/github.com/rackspace/gophercloud/openstack/compute/v2/extensions">extensions</a>
+directory for a full list of Compute extensions.</p>
+
+<h1 id="a-nameprovidersaproviders"><a name="providers"></a>Providers</h1>
+
+<h3 id="a-namerackspacearackspace"><a name="rackspace"></a>Rackspace</h3>
+
+<ul>
+  <li><a href="https://developer.rackspace.com/docs/cloud-servers/getting-started/?lang=go">Quickstart for Cloud Servers</a>
+on the Rackspace Developer portal.</li>
+</ul>
+
+</div>
+
+    </div>
+
+    <script type="text/javascript">
+  var _gaq = _gaq || [];
+   _gaq.push(['_setAccount', 'UA-35639070-1']);
+   _gaq.push(['_setDomainName', 'rackspace.com']);
+   _gaq.push(['_trackPageview']);
+
+  (function () {
+      var ga = document.createElement('script');
+      ga.type = 'text/javascript';
+      ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+       var s = document.getElementsByTagName('script')[0];
+       s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </body>
+</html>

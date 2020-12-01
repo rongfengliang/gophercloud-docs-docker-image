@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Getting Started with Networking v2 &middot; gophercloud
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../public/css/poole.css">
+  <link rel="stylesheet" href="../public/css/syntax.css">
+  <link rel="stylesheet" href="../public/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://gophercloud.io/public/apple-touch-icon-144-precomposed.png">
+                                 <link rel="shortcut icon" href="../public/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="http://gophercloud.io/atom.xml">
+</head>
+
+
+  <body>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <img src="../public/logo.png" />
+      <h1>
+        <a href="../index.html">
+          gophercloud
+        </a>
+      </h1>
+      <p class="lead">Gophercloud is an open-source library for working with OpenStack clouds in golang.</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="../index.html">Home</a>
+
+      <a class="sidebar-nav-item" href="../installation.html">Installation</a>
+      <a class="sidebar-nav-item" href="../docs.html">Documentation</a>
+
+      
+        <ul>
+          <li><a href="block-storage.html">Block Storage</a></li>
+          <li><a href="compute.html">Compute</a></li>
+          <li><a href="identity.html">Identity</a></li>
+          <li><a href="networking.html">Networking</a></li>
+          <li><a href="object-storage.html">Object Storage</a></li>
+        </ul>
+      
+
+      <a class="sidebar-nav-item" href="https://github.com/rackspace/gophercloud/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a>
+      <a class="sidebar-nav-item" href="https://github.com/rackspace/gophercloud" target="_blank">GitHub</a>
+      <a class="sidebar-nav-item" href="http://godoc.org/github.com/rackspace/gophercloud" target="_blank">GoDoc</a>
+    </nav>
+
+    <p>&copy; 2015. All rights reserved.</p>
+
+    <p>Powered by <a href="https://github.com/poole/hyde" target="_blank">Hyde</a>.</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="page docpage">
+  <h1 class="page-title">Getting Started with Networking v2</h1>
+  <ul>
+  <li><a href="networking.html#setup">Setup</a></li>
+  <li><a href="networking.html#networks">Networks</a>
+    <ul>
+      <li><a href="networking.html#create-network">Create a network</a></li>
+      <li><a href="networking.html#list-networks">List networks</a></li>
+      <li><a href="networking.html#get-network">Get network details</a></li>
+      <li><a href="networking.html#update-network">Update a network</a></li>
+      <li><a href="networking.html#delete-network">Delete a network</a></li>
+    </ul>
+  </li>
+  <li><a href="networking.html#subnets">Subnets</a>
+    <ul>
+      <li><a href="networking.html#create-subnet">Create a subnet</a></li>
+      <li><a href="networking.html#list-subnets">List subnets</a></li>
+      <li><a href="networking.html#get-subnet">Get subnet details</a></li>
+      <li><a href="networking.html#update-subnet">Update a subnet</a></li>
+      <li><a href="networking.html#delete-subnet">Delete a subnet</a></li>
+    </ul>
+  </li>
+  <li><a href="networking.html#ports">Ports</a>
+    <ul>
+      <li><a href="networking.html#create-port">Create a port</a></li>
+      <li><a href="networking.html#list-ports">List ports</a></li>
+      <li><a href="networking.html#get-port">Get port details</a></li>
+      <li><a href="networking.html#update-port">Update a port</a></li>
+      <li><a href="networking.html#delete-port">Delete a port</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="a-namesetupasetup"><a name="setup"></a>Setup</h2>
+
+<p>In order to interact with OpenStack APIs, you must first pass in your auth
+credentials to a <code>Provider</code> struct. Once you have this, you then retrieve
+whichever service struct you’re interested in - so in our case, we invoke the
+<code>NewNetworkV2</code> method:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack&quot;</span>
+
+<span class="nx">authOpts</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">AuthOptionsFromEnv</span><span class="p">()</span>
+
+<span class="nx">provider</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">AuthenticatedClient</span><span class="p">(</span><span class="nx">authOpts</span><span class="p">)</span>
+
+<span class="nx">client</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">NewNetworkV2</span><span class="p">(</span><span class="nx">provider</span><span class="p">,</span> <span class="nx">gophercloud</span><span class="p">.</span><span class="nx">EndpointOpts</span><span class="p">{</span>
+	<span class="nx">Name</span><span class="p">:</span>   <span class="s">&quot;neutron&quot;</span><span class="p">,</span>
+	<span class="nx">Region</span><span class="p">:</span> <span class="s">&quot;RegionOne&quot;</span><span class="p">,</span>
+<span class="p">})</span></code></pre></div>
+
+<p>If you’re unsure about how to retrieve credentials, please read our <a href="../docs.html">introductory
+guide</a> which outlines the steps you need to take.</p>
+
+<h2 id="a-namenetworksanetworks"><a name="networks"></a>Networks</h2>
+
+<p>A network is the central resource of the OpenStack Neutron API. If you were to
+compare it to physical networking, a Neutron network would be analagous to a
+VLAN - which is an isolated <a href="http://en.wikipedia.org/wiki/Broadcast_domain">broadcast domain</a>
+inside a larger <a href="http://en.wikipedia.org/wiki/Data_link_layer">layer-2 network</a>.
+Because of this virtualized partitioning, a virtual network can only share
+packets with other networks through one or more routers.</p>
+
+<h3 id="a-namecreate-networkacreate-a-network"><a name="create-network"></a>Create a network</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack/networking/v2/networks&quot;</span>
+
+<span class="c1">// We specify a name and that it should forward packets</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">networks</span><span class="p">.</span><span class="nx">CreateOpts</span><span class="p">{</span><span class="nx">Name</span><span class="p">:</span> <span class="s">&quot;main_network&quot;</span><span class="p">,</span> <span class="nx">AdminStateUp</span><span class="p">:</span> <span class="nx">networks</span><span class="p">.</span><span class="nx">Up</span><span class="p">}</span>
+
+<span class="c1">// Execute the operation and get back a networks.Network struct</span>
+<span class="nx">network</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">networks</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namelist-networksalist-networks"> <a name="list-networks"></a>List networks</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/pagination&quot;</span>
+
+<span class="c1">// We have the option of filtering the network list. If we want the full</span>
+<span class="c1">// collection, leave it as an empty struct</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">networks</span><span class="p">.</span><span class="nx">ListOpts</span><span class="p">{</span><span class="nx">Shared</span><span class="p">:</span> <span class="kc">false</span><span class="p">}</span>
+
+<span class="c1">// Retrieve a pager (i.e. a paginated collection)</span>
+<span class="nx">pager</span> <span class="o">:=</span> <span class="nx">networks</span><span class="p">.</span><span class="nx">List</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Define an anonymous function to be executed on each page&#39;s iteration</span>
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">pager</span><span class="p">.</span><span class="nx">EachPage</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">page</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">networkList</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">networks</span><span class="p">.</span><span class="nx">ExtractNetworks</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">n</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">networkList</span> <span class="p">{</span>
+		<span class="c1">// &quot;n&quot; will be a networks.Network</span>
+	<span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+<h3 id="a-nameget-networkaget-details-for-an-existing-network"><a name="get-network"></a>Get details for an existing network</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// We need to know what the UUID of our network is and pass it in as a string</span>
+<span class="nx">network</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">networks</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;id&quot;</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-nameupdate-networkaupdate-an-existing-network"><a name="update-network"></a>Update an existing network</h3>
+
+<p>You can update a network’s name, along with its “shared” or “admin” status:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">opts</span> <span class="o">:=</span> <span class="nx">networks</span><span class="p">.</span><span class="nx">UpdateOpts</span><span class="p">{</span><span class="nx">Name</span><span class="p">:</span> <span class="s">&quot;new_name&quot;</span><span class="p">,</span> <span class="nx">Shared</span><span class="p">:</span> <span class="kc">true</span><span class="p">}</span>
+
+<span class="c1">// Like Get(), we need the UUID in string form</span>
+<span class="nx">network</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">networks</span><span class="p">.</span><span class="nx">Update</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span></code></pre></div>
+
+<h3 id="a-namedelete-networkadelete-a-network"><a name="delete-network"></a>Delete a network</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">result</span> <span class="o">:=</span> <span class="nx">networks</span><span class="p">.</span><span class="nx">Delete</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;id&quot;</span><span class="p">)</span></code></pre></div>
+
+<h2 id="a-namesubnetsasubnets"><a name="subnets"></a>Subnets</h2>
+
+<p>A subnet is a block of IP addresses (either version 4 or 6) that are assigned
+to devices in a particular network. A device in the context of Neutron
+specifically means a virtual machine (Compute instance). For this reason, each
+subnet must have a <a href="http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a>
+and be associated with a network.</p>
+
+<h3 id="a-namecreate-subnetacreate-a-subnet"><a name="create-subnet"></a>Create a subnet</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack/networking/v2/subnets&quot;</span>
+
+<span class="c1">// You must associate a new subnet with an existing network - to do this you</span>
+<span class="c1">// need its UUID. You must also provide a well-formed CIDR value.</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">subnets</span><span class="p">.</span><span class="nx">CreateOpts</span><span class="p">{</span>
+	<span class="nx">NetworkID</span><span class="p">:</span>  <span class="s">&quot;network_id&quot;</span><span class="p">,</span>
+	<span class="nx">CIDR</span><span class="p">:</span>       <span class="s">&quot;192.168.199.0/24&quot;</span><span class="p">,</span>
+	<span class="nx">IPVersion</span><span class="p">:</span>  <span class="nx">subnets</span><span class="p">.</span><span class="nx">IPv4</span><span class="p">,</span>
+	<span class="nx">Name</span><span class="p">:</span>       <span class="s">&quot;my_subnet&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1">// Execute the operation and get back a subnets.Subnet struct</span>
+<span class="nx">subnet</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">subnets</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namelist-subnetsalist-all-subnets"><a name="list-subnets"></a>List all subnets</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/pagination&quot;</span>
+
+<span class="c1">// We have the option of filtering subnets. For example, we may want to return</span>
+<span class="c1">// every subnet that belongs to a specific network. Or filter again by name.</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">subnets</span><span class="p">.</span><span class="nx">ListOpts</span><span class="p">{</span><span class="nx">NetworkID</span><span class="p">:</span> <span class="s">&quot;some_uuid&quot;</span><span class="p">}</span>
+
+<span class="c1">// Retrieve a pager (i.e. a paginated collection)</span>
+<span class="nx">pager</span> <span class="o">:=</span> <span class="nx">subnets</span><span class="p">.</span><span class="nx">List</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Define an anonymous function to be executed on each page&#39;s iteration</span>
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">pager</span><span class="p">.</span><span class="nx">EachPage</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">page</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">subnetList</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">subnets</span><span class="p">.</span><span class="nx">ExtractSubnets</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">s</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">subnetList</span> <span class="p">{</span>
+		<span class="c1">// &quot;s&quot; will be a subnets.Subnet</span>
+	<span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+<h3 id="a-nameget-subnetaget-details-for-an-existing-subnet"><a name="get-subnet"></a>Get details for an existing subnet</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// We need to know what the UUID of our subnet is and pass it in as a string</span>
+<span class="nx">subnet</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">subnets</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;id&quot;</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-nameupdate-subnetaupdate-an-existing-subnet"><a name="update-subnet"></a>Update an existing subnet</h3>
+
+<p>You can edit the name, gateway IP address, DNS nameservers, host routes
+and “enable DHCP” status.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">opts</span> <span class="o">:=</span> <span class="nx">subnets</span><span class="p">.</span><span class="nx">UpdateOpts</span><span class="p">{</span><span class="nx">Name</span><span class="p">:</span> <span class="s">&quot;new_subnet_name&quot;</span><span class="p">}</span>
+<span class="nx">subnet</span><span class="p">,</span> <span class="nx">err</span> <span class="p">=</span> <span class="nx">subnets</span><span class="p">.</span><span class="nx">Update</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="nx">opts</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namedelete-subnetadelete-a-subnet"><a name="delete-subnet"></a>Delete a subnet</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">result</span> <span class="o">:=</span> <span class="nx">subnets</span><span class="p">.</span><span class="nx">Delete</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;id&quot;</span><span class="p">)</span></code></pre></div>
+
+<h2 id="a-nameportsaports"><a name="ports"></a>Ports</h2>
+
+<p>Before talking about what ports are, an important concept to define first are
+network switches (both the virtual and physical kind). A network switch connects
+different network segments together, and a port is the location where devices
+connect to the switch. A device in our case is usually a virtual machine. For
+more information about these terms, read this <a href="http://www.wisegeek.com/what-is-a-switch-port.htm">related article</a>.</p>
+
+<h3 id="a-namecreate-portacreate-a-port"><a name="create-port"></a>Create a port</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack/networking/v2/ports&quot;</span>
+
+<span class="c1">// You must associate a new port with an existing network - to do this you</span>
+<span class="c1">// need its UUID. Also notice the &quot;FixedIPs&quot; field; this allows you to specify</span>
+<span class="c1">// either a specific IP to use for this port, or the subnet ID from which a</span>
+<span class="c1">// random free IP is selected.</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">ports</span><span class="p">.</span><span class="nx">CreateOpts</span><span class="p">{</span>
+	<span class="nx">NetworkID</span><span class="p">:</span>    <span class="s">&quot;network_id&quot;</span><span class="p">,</span>
+	<span class="nx">Name</span><span class="p">:</span>         <span class="s">&quot;my_port&quot;</span><span class="p">,</span>
+	<span class="nx">AdminStateUp</span><span class="p">:</span> <span class="nx">ports</span><span class="p">.</span><span class="nx">Up</span><span class="p">,</span>
+	<span class="nx">FixedIPs</span><span class="p">:</span>     <span class="p">[]</span><span class="nx">ports</span><span class="p">.</span><span class="nx">IP</span><span class="p">{</span><span class="nx">ports</span><span class="p">.</span><span class="nx">IP</span><span class="p">{</span><span class="nx">SubnetID</span><span class="p">:</span> <span class="s">&quot;subnet_id&quot;</span><span class="p">}},</span>
+<span class="p">}</span>
+
+<span class="c1">// Execute the operation and get back a subnets.Subnet struct</span>
+<span class="nx">port</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">ports</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namelist-portsalist-all-ports"><a name="list-ports"></a>List all ports</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/pagination&quot;</span>
+
+<span class="c1">// We have the option of filtering ports. For example, we may want to return</span>
+<span class="c1">// every port that belongs to a specific network. Or filter again by MAC address.</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">ports</span><span class="p">.</span><span class="nx">ListOpts</span><span class="p">{</span><span class="nx">NetworkID</span><span class="p">:</span> <span class="s">&quot;some_uuid&quot;</span><span class="p">,</span> <span class="nx">MACAddress</span><span class="p">:</span> <span class="s">&quot;some_addr&quot;</span><span class="p">}</span>
+
+<span class="c1">// Retrieve a pager (i.e. a paginated collection)</span>
+<span class="nx">pager</span> <span class="o">:=</span> <span class="nx">ports</span><span class="p">.</span><span class="nx">List</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Define an anonymous function to be executed on each page&#39;s iteration</span>
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">pager</span><span class="p">.</span><span class="nx">EachPage</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">page</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">portList</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">ports</span><span class="p">.</span><span class="nx">ExtractPorts</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">s</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">portList</span> <span class="p">{</span>
+		<span class="c1">// &quot;p&quot; will be a ports.Port</span>
+	<span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+<h3 id="a-nameget-portaget-details-for-an-existing-port"><a name="get-port"></a>Get details for an existing port</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// We need to know what the UUID of our port is and pass it in as a string</span>
+<span class="nx">port</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">ports</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;id&quot;</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-nameupdate-portaupdate-an-existing-port"><a name="update-port"></a>Update an existing port</h3>
+
+<p>You can edit the name, admin state, fixed IPs, device ID, device owner and
+security groups.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">opts</span> <span class="o">:=</span> <span class="nx">ports</span><span class="p">.</span><span class="nx">UpdateOpts</span><span class="p">{</span><span class="nx">Name</span><span class="p">:</span> <span class="s">&quot;new_port_name&quot;</span><span class="p">}</span>
+<span class="nx">port</span><span class="p">,</span> <span class="nx">err</span> <span class="p">=</span> <span class="nx">ports</span><span class="p">.</span><span class="nx">Update</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="nx">opts</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h3 id="a-namedelete-portadelete-a-port"><a name="delete-port"></a>Delete a port</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">result</span> <span class="o">:=</span> <span class="nx">ports</span><span class="p">.</span><span class="nx">Delete</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="s">&quot;id&quot;</span><span class="p">)</span></code></pre></div>
+
+
+</div>
+
+    </div>
+
+    <script type="text/javascript">
+  var _gaq = _gaq || [];
+   _gaq.push(['_setAccount', 'UA-35639070-1']);
+   _gaq.push(['_setDomainName', 'rackspace.com']);
+   _gaq.push(['_trackPageview']);
+
+  (function () {
+      var ga = document.createElement('script');
+      ga.type = 'text/javascript';
+      ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+       var s = document.getElementsByTagName('script')[0];
+       s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Getting Started with Identity v2 &middot; gophercloud
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../../public/css/poole.css">
+  <link rel="stylesheet" href="../../public/css/syntax.css">
+  <link rel="stylesheet" href="../../public/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://gophercloud.io/public/apple-touch-icon-144-precomposed.png">
+                                 <link rel="shortcut icon" href="../../public/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="http://gophercloud.io/atom.xml">
+</head>
+
+
+  <body>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <img src="../../public/logo.png" />
+      <h1>
+        <a href="../../index.html">
+          gophercloud
+        </a>
+      </h1>
+      <p class="lead">Gophercloud is an open-source library for working with OpenStack clouds in golang.</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="../../index.html">Home</a>
+
+      <a class="sidebar-nav-item" href="../../installation.html">Installation</a>
+      <a class="sidebar-nav-item" href="../../docs.html">Documentation</a>
+
+      
+        <ul>
+          <li><a href="../block-storage.html">Block Storage</a></li>
+          <li><a href="../compute.html">Compute</a></li>
+          <li><a href="../identity.html">Identity</a></li>
+          <li><a href="../networking.html">Networking</a></li>
+          <li><a href="../object-storage.html">Object Storage</a></li>
+        </ul>
+      
+
+      <a class="sidebar-nav-item" href="https://github.com/rackspace/gophercloud/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a>
+      <a class="sidebar-nav-item" href="https://github.com/rackspace/gophercloud" target="_blank">GitHub</a>
+      <a class="sidebar-nav-item" href="http://godoc.org/github.com/rackspace/gophercloud" target="_blank">GoDoc</a>
+    </nav>
+
+    <p>&copy; 2015. All rights reserved.</p>
+
+    <p>Powered by <a href="https://github.com/poole/hyde" target="_blank">Hyde</a>.</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="page">
+  <h1 class="page-title">Getting Started with Identity v2</h1>
+  <h2 id="setup">Setup</h2>
+
+<p>In order to interact with OpenStack APIs, you must first pass in your auth
+credentials to a <code>Provider</code> struct. Once you have this, you then retrieve
+whichever service struct you’re interested in - so in our case, we invoke the
+<code>NewIdentityV2</code> method:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack&quot;</span>
+
+<span class="nx">authOpts</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">AuthOptionsFromEnv</span><span class="p">()</span>
+
+<span class="nx">provider</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">AuthenticatedClient</span><span class="p">(</span><span class="nx">authOpts</span><span class="p">)</span>
+
+<span class="nx">client</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">openstack</span><span class="p">.</span><span class="nx">NewIdentityV2</span><span class="p">(</span><span class="nx">provider</span><span class="p">,</span> <span class="nx">gophercloud</span><span class="p">.</span><span class="nx">EndpointOpts</span><span class="p">{</span>
+	<span class="nx">Region</span><span class="p">:</span> <span class="s">&quot;RegionOne&quot;</span><span class="p">,</span>
+<span class="p">})</span></code></pre></div>
+
+<p>If you’re unsure about how to retrieve credentials, please read our <a href="../../docs.html">introductory
+guide</a> which outlines the steps you need to take.</p>
+
+<h2 id="tokens">Tokens</h2>
+
+<p>A token is an arbitrary bit of text that is returned when you authenticate,
+which you subsequently use as to access and control API resources. Each
+token has a scope that describes which resources are accessible with it. A
+token may be revoked at anytime and is valid for a finite duration.</p>
+
+<h3 id="generate-a-token">Generate a token</h3>
+
+<p>The configuration options that you need to pass into <code>tokens.AuthOptions</code> will
+mostly depend on your provider: some authenticate with API keys rather than
+passwords, some require tenant names or tenant IDs; with others, both are
+required. It is therefore useful to double check what the expectations are
+before authenticating.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="s">&quot;github.com/rackspace/gophercloud/openstack/identity/v2/tokens&quot;</span>
+
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">AuthOptions</span><span class="p">{</span>
+	<span class="nx">IdentityEndpoint</span><span class="p">:</span> <span class="s">&quot;{identityEndpoint}&quot;</span><span class="p">,</span>
+	<span class="nx">Username</span><span class="p">:</span> <span class="s">&quot;{username}&quot;</span><span class="p">,</span>
+	<span class="nx">Password</span><span class="p">:</span> <span class="s">&quot;{password}&quot;</span><span class="p">,</span>
+	<span class="nx">TenantID</span><span class="p">:</span> <span class="s">&quot;{tenantID}&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="nx">token</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">Create</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">).</span><span class="nx">Extract</span><span class="p">()</span></code></pre></div>
+
+<h2 id="tenants">Tenants</h2>
+
+<p>A tenant is a container used to group or isolate resources and/or identity
+objects. Depending on the service operator, a tenant can map to a customer,
+account, organization, or project.</p>
+
+<h3 id="list-tenants">List tenants</h3>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">import</span> <span class="p">(</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/pagination&quot;</span>
+	<span class="s">&quot;github.com/rackspace/gophercloud/openstack/identity/v2/tenants&quot;</span>
+<span class="p">)</span>
+
+<span class="c1">// We have the option of filtering the tenant list. If we want the full</span>
+<span class="c1">// collection, leave it as an empty struct</span>
+<span class="nx">opts</span> <span class="o">:=</span> <span class="nx">tenants</span><span class="p">.</span><span class="nx">ListOpts</span><span class="p">{</span><span class="nx">Limit</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
+
+<span class="c1">// Retrieve a pager (i.e. a paginated collection)</span>
+<span class="nx">pager</span> <span class="o">:=</span> <span class="nx">tenants</span><span class="p">.</span><span class="nx">List</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span>
+
+<span class="c1">// Define an anonymous function to be executed on each page&#39;s iteration</span>
+<span class="nx">err</span> <span class="o">:=</span> <span class="nx">pager</span><span class="p">.</span><span class="nx">EachPage</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">page</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">tenantList</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">tenants</span><span class="p">.</span><span class="nx">ExtractTenants</span><span class="p">(</span><span class="nx">page</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">t</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">tenantList</span> <span class="p">{</span>
+		<span class="c1">// &quot;t&quot; will be a tenants.Tenant</span>
+	<span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+
+</div>
+
+    </div>
+
+    <script type="text/javascript">
+  var _gaq = _gaq || [];
+   _gaq.push(['_setAccount', 'UA-35639070-1']);
+   _gaq.push(['_setDomainName', 'rackspace.com']);
+   _gaq.push(['_trackPageview']);
+
+  (function () {
+      var ga = document.createElement('script');
+      ga.type = 'text/javascript';
+      ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+       var s = document.getElementsByTagName('script')[0];
+       s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+  </body>
+</html>
